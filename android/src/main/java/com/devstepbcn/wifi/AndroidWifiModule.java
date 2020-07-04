@@ -476,6 +476,12 @@ public class AndroidWifiModule extends ReactContextBaseJavaModule {
 		callback.invoke(ip);
 	}
 
+	@ReactMethod
+	public void getConfiguredNetworks(Callback callback) {
+		List<WifiConfiguration> configList = wifi.getConfiguredNetworks();
+		callback.invoke(configList)
+	}
+
 	public static String longToIP(int longIp){
 		StringBuffer sb = new StringBuffer("");
 		String[] strip=new String[4];
