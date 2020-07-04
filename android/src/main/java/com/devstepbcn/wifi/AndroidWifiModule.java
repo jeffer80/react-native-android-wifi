@@ -478,8 +478,25 @@ public class AndroidWifiModule extends ReactContextBaseJavaModule {
 
 	@ReactMethod
 	public void getConfiguredNetworks(Callback callback) {
-		List<WifiConfiguration> configList = wifi.getConfiguredNetworks();
-		callback.invoke(configList)
+		List<WifiConfiguration> wifiList = wifi.getConfiguredNetworks();
+		JSONArray wifiArray = new JSONArray();
+		for (WifiConfiguration wifi : wifiList) {
+			if (wifi.SSID == null || wifi.SSID.isEmpty()) {
+                continue;
+			}
+			try{
+				JSONObject wifiObject = new JSONObject();
+				wifiObject.put("networkId", wifi.networkId);
+				wifiObject.put("SSID", wifi.SSID.replace("\"", ""));
+				wifiObject.put("BSSID", wifi.BSSID);
+				wifiObject.put("priority", wifi.priority);
+				wifiObject.put("status", wifi.status);
+				wifiArray.put(wifiObject);
+			}
+			catch(Exception ex){
+			}
+		}
+		callback.invoke(wifiArray.toString());
 	}
 
 	public static String longToIP(int longIp){
