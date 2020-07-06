@@ -31,7 +31,11 @@ import android.widget.Toast;
 import java.util.List;
 import java.lang.Thread;
 import android.net.DhcpInfo;
-
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -440,6 +444,27 @@ public class AndroidWifiModule extends ReactContextBaseJavaModule {
 		WifiInfo info = wifi.getConnectionInfo();
 		String stringip = longToIP(info.getIpAddress());
 		callback.invoke(stringip);
+	}
+
+	@ReactMethod
+	public void getAllIP(final Callback callback) {
+		JSONArray ipArray = new JSONArray();
+		try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface inf = interfaces.nextElement();
+                Enumeration<InetAddress> address = inf.getInetAddresses();
+                while (address.hasMoreElements()) {
+                    InetAddress ip = address.nextElement();
+                    if (!ip.isLoopbackAddress() && ip instanceof Inet4Address) {
+                        ipArray.put(ip.getHostAddress().toString());
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+		callback.invoke(ipArray.toString());
 	}
 
 	//This method will remove the wifi network as per the passed SSID from the device list
